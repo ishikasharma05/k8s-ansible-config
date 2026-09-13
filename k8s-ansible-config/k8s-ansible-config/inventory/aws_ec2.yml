@@ -5,7 +5,7 @@ plugin: amazon.aws.aws_ec2
 regions:
   - ap-south-1   # change to your Terraform region
 filters:
-  tag:Role: eks-worker
+  tag:Role: kubernetes-worker
   instance-state-name: running
 keyed_groups:
   - key: tags.Environment
