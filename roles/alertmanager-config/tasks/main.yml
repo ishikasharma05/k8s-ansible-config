@@ -1,0 +1,24 @@
+---
+# Same pattern as prometheus-config: Alertmanager itself is deployed via the
+# kube-prometheus-stack Helm chart. This role templates the alertmanager.yml
+# (with the Slack receiver) and writes it locally so it can be applied as a
+# Kubernetes Secret that the Helm release consumes via alertmanagerSpec config.
+
+- name: Render alertmanager.yml with Slack receiver
+  template:
+    src: alertmanager.yml.j2
+    dest: "{{ playbook_dir }}/generated/alertmanager.yml"
+  delegate_to: localhost
+  run_once: true
+  no_log: true   # contains the Slack webhook URL — keep it out of Ansible logs
+
+- name: Show reminder to sync config into the cluster Secret
+  debug:
+    msg: >
+      Generated {{ playbook_dir }}/generated/alertmanager.yml —
+      apply it with:
+      kubectl create secret generic alertmanager-main
+      --from-file=alertmanager.yml={{ playbook_dir }}/generated/alertmanager.yml
+      -n monitoring --dry-run=client -o yaml | kubectl apply -f -
+  delegate_to: localhost
+  run_once: true

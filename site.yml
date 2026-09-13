@@ -1,0 +1,11 @@
+---
+- name: Configure EKS worker nodes
+  hosts: all
+  become: true
+  gather_facts: true
+
+  roles:
+    - node-setup
+    - node-exporter
+    - prometheus-config
+    - alertmanager-config
