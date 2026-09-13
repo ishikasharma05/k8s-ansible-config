@@ -1,0 +1,27 @@
+---
+# This role does NOT install Prometheus (that's done via Helm inside the cluster,
+# per the capstone spec). Its job is to generate a file_sd target list of every
+# EC2 worker node's node_exporter endpoint, built from the dynamic inventory,
+# so Prometheus can scrape bare-metal/EC2 node metrics alongside in-cluster
+# service discovery. The generated file gets synced into a ConfigMap that the
+# Helm-deployed Prometheus mounts via extraScrapeConfigs / file_sd_configs.
+#
+# Run this role against localhost (delegate), not the EC2 hosts themselves.
+
+- name: Build node_exporter file_sd target list
+  template:
+    src: node_targets.json.j2
+    dest: "{{ playbook_dir }}/generated/node_targets.json"
+  delegate_to: localhost
+  run_once: true
+
+- name: Show reminder to sync targets into the cluster ConfigMap
+  debug:
+    msg: >
+      Generated {{ playbook_dir }}/generated/node_targets.json —
+      apply it with:
+      kubectl create configmap prometheus-node-targets
+      --from-file=node_targets.json={{ playbook_dir }}/generated/node_targets.json
+      -n monitoring --dry-run=client -o yaml | kubectl apply -f -
+  delegate_to: localhost
+  run_once: true

@@ -1,0 +1,8 @@
+---
+slack_channel: "alerts"
+
+# DO NOT put slack_webhook_url here in plaintext.
+# Create vault.yml with: ansible-vault create group_vars/vault.yml
+# and inside it put:
+#   slack_webhook_url: "https://hooks.slack.com/services/XXX/YYY/ZZZ"
+# Then run playbooks with: ansible-playbook site.yml --ask-vault-pass

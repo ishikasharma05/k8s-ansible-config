@@ -1,0 +1,16 @@
+---
+# Dynamic inventory: pulls EC2 instances tagged Role=eks-worker
+# Requires: pip install boto3 botocore, and amazon.aws collection installed
+plugin: amazon.aws.aws_ec2
+regions:
+  - ap-south-1   # change to your Terraform region
+filters:
+  tag:Role: eks-worker
+  instance-state-name: running
+keyed_groups:
+  - key: tags.Environment
+    prefix: env
+hostnames:
+  - private-ip-address
+compose:
+  ansible_host: private_ip_address
