@@ -11,6 +11,10 @@ keyed_groups:
   - key: tags.Environment
     prefix: env
 hostnames:
-  - private-ip-address
+  - instance-id
+
 compose:
-  ansible_host: private_ip_address
+  ansible_host: instance_id
+  ansible_connection: '"aws_ssm"'
+  ansible_aws_ssm_region: '"ap-south-1"'
+  ansible_aws_ssm_bucket_name: '"ansible-ssm-662252246018"'
