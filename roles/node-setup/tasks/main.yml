@@ -37,37 +37,47 @@
     - { name: "net.bridge.bridge-nf-call-ip6tables", value: "1" }
     - { name: "net.ipv4.ip_forward", value: "1" }
 
-- name: Disable unattended-upgrades auto-reboot (avoid surprise node restarts)
+- name: Disable unattended-upgrades auto-reboot (Debian/Ubuntu only)
   lineinfile:
     path: /etc/apt/apt.conf.d/50unattended-upgrades
     regexp: '^Unattended-Upgrade::Automatic-Reboot'
     line: 'Unattended-Upgrade::Automatic-Reboot "false";'
   when: ansible_os_family == "Debian"
 
-- name: Ensure UFW is installed
+- name: Ensure UFW is installed (Debian/Ubuntu only)
   apt:
     name: ufw
     state: present
     update_cache: true
   when: ansible_os_family == "Debian"
 
-- name: Allow only required ports (kubelet, node-exporter, SSH)
+- name: Allow only required ports (kubelet, node-exporter, SSH) — Debian/Ubuntu only
   ufw:
     rule: allow
     port: "{{ item }}"
     proto: tcp
   loop:
     - "22"
-    - "10250"   # kubelet API
-    - "9100"    # node-exporter
+    - "10250"
+    - "9100"
+  when: ansible_os_family == "Debian"
 
-- name: Enable UFW
+- name: Enable UFW (Debian/Ubuntu only)
   ufw:
     state: enabled
     policy: deny
+  when: ansible_os_family == "Debian"
+
+- name: Note firewall approach for RedHat-family (AL2023) hosts
+  debug:
+    msg: >
+      Host firewall skipped on {{ ansible_distribution }} — traffic is restricted
+      at the AWS security-group layer instead (see terraform/eks.tf worker
+      security group rules).
+  when: ansible_os_family != "Debian"
 
 # ---- Containerd ----
-- name: Install containerd dependencies
+- name: Install containerd dependencies (Debian/Ubuntu only)
   apt:
     name:
       - apt-transport-https
@@ -78,28 +88,39 @@
     update_cache: true
   when: ansible_os_family == "Debian"
 
-- name: Install containerd
+- name: Install containerd (Debian/Ubuntu only)
   apt:
     name: containerd
     state: present
   when: ansible_os_family == "Debian"
 
-- name: Create containerd config directory
+- name: Create containerd config directory (Debian/Ubuntu only)
   file:
     path: /etc/containerd
     state: directory
+  when: ansible_os_family == "Debian"
 
-- name: Generate default containerd config
+- name: Generate default containerd config (Debian/Ubuntu only)
   shell: containerd config default > /etc/containerd/config.toml
   args:
     creates: /etc/containerd/config.toml
+  when: ansible_os_family == "Debian"
 
-- name: Enable SystemdCgroup for containerd (required by kubelet)
+- name: Enable SystemdCgroup for containerd (Debian/Ubuntu only)
   lineinfile:
     path: /etc/containerd/config.toml
     regexp: '^\s*SystemdCgroup ='
     line: '            SystemdCgroup = true'
   notify: restart containerd
+  when: ansible_os_family == "Debian"
+
+- name: Note containerd approach for RedHat-family (AL2023) hosts
+  debug:
+    msg: >
+      containerd is pre-installed and pre-configured by the AL2023 EKS-optimized
+      AMI bootstrap process — skipping manual install/config to avoid overwriting
+      AWS's working setup.
+  when: ansible_os_family != "Debian"
 
 - name: Ensure containerd is enabled and running
   systemd:

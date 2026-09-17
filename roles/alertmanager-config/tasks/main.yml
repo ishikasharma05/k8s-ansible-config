@@ -10,7 +10,10 @@
     dest: "{{ playbook_dir }}/generated/alertmanager.yml"
   delegate_to: localhost
   run_once: true
+  become: false
   no_log: true   # contains the Slack webhook URL — keep it out of Ansible logs
+
+
 
 - name: Show reminder to sync config into the cluster Secret
   debug:

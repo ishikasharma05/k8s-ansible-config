@@ -1,0 +1,258 @@
+[WARNING]: Ansible is being run in a world writable directory (/mnt/c/Users/ishik/OneDrive/Documents/GitHub/k8s-ansible-config), ignoring it as an ansible.cfg source. For more information see https://docs.ansible.com/ansible/devel/reference_appendices/config.html#cfg-in-world-writable-dir
+[WARNING]: Deprecation warnings can be disabled by setting `deprecation_warnings=False` in ansible.cfg.
+[DEPRECATION WARNING]: Importing 'to_text' from 'ansible.module_utils._text' is deprecated. This feature will be removed from ansible-core version 2.24. Use ansible.module_utils.common.text.converters instead.
+[DEPRECATION WARNING]: Importing 'to_native' from 'ansible.module_utils._text' is deprecated. This feature will be removed from ansible-core version 2.24. Use ansible.module_utils.common.text.converters instead.
+[DEPRECATION WARNING]: Passing `disable_lookups` to `template` is deprecated. This feature will be removed from ansible-core version 2.23.
+[WARNING]: Found variable using reserved name 'tags'.
+Origin: <unknown>
+
+tags
+
+
+PLAY [Configure EKS worker nodes] **********************************************
+
+TASK [Gathering Facts] *********************************************************
+[WARNING]: Host 'i-0103fdc8f57e41432' is using the discovered Python interpreter at '/usr/bin/python3.9', but future installation of another Python interpreter could cause a different interpreter to be discovered. See https://docs.ansible.com/ansible-core/2.20/reference_appendices/interpreter_discovery.html for more information.
+[DEPRECATION WARNING]: Importing 'to_bytes' from 'ansible.module_utils._text' is deprecated. This feature will be removed from ansible-core version 2.24. Use ansible.module_utils.common.text.converters instead.
+[WARNING]: Host 'i-0c6deff143ea4b17e' is using the discovered Python interpreter at '/usr/bin/python3.9', but future installation of another Python interpreter could cause a different interpreter to be discovered. See https://docs.ansible.com/ansible-core/2.20/reference_appendices/interpreter_discovery.html for more information.
+ok: [i-0103fdc8f57e41432]
+ok: [i-0c6deff143ea4b17e]
+
+TASK [node-setup : Disable swap (required for kubelet)] ************************
+skipping: [i-0c6deff143ea4b17e]
+skipping: [i-0103fdc8f57e41432]
+
+TASK [node-setup : Remove swap entry from fstab] *******************************
+ok: [i-0103fdc8f57e41432]
+ok: [i-0c6deff143ea4b17e]
+
+TASK [node-setup : Load required kernel modules for Kubernetes networking] *****
+ok: [i-0103fdc8f57e41432] => (item=overlay)
+ok: [i-0c6deff143ea4b17e] => (item=overlay)
+changed: [i-0c6deff143ea4b17e] => (item=br_netfilter)
+changed: [i-0103fdc8f57e41432] => (item=br_netfilter)
+
+TASK [node-setup : Persist kernel modules across reboot] ***********************
+changed: [i-0103fdc8f57e41432]
+changed: [i-0c6deff143ea4b17e]
+
+TASK [node-setup : Set required sysctl params for Kubernetes] ******************
+[WARNING]: WorkerProcess for [i-0103fdc8f57e41432/TASK: node-setup : Set required sysctl params for Kubernetes] errantly sent data directly to stderr instead of using Display:
+    Exception ignored while calling deallocator <function Connection.__del__ at 0x7b583720f1c0>:
+    Traceback (most recent call last):
+      File "/usr/lib/python3/dist-packages/ansible_collections/amazon/aws/plugins/connection/aws_ssm.py", line 502, in __del__
+        s
+
+changed: [i-0103fdc8f57e41432] => (item={'name': 'net.bridge.bridge-nf-call-iptables', 'value': '1'})
+changed: [i-0c6deff143ea4b17e] => (item={'name': 'net.bridge.bridge-nf-call-iptables', 'value': '1'})
+changed: [i-0c6deff143ea4b17e] => (item={'name': 'net.bridge.bridge-nf-call-ip6tables', 'value': '1'})
+changed: [i-0103fdc8f57e41432] => (item={'name': 'net.bridge.bridge-nf-call-ip6tables', 'value': '1'})
+changed: [i-0c6deff143ea4b17e] => (item={'name': 'net.ipv4.ip_forward', 'value': '1'})
+changed: [i-0103fdc8f57e41432] => (item={'name': 'net.ipv4.ip_forward', 'value': '1'})
+
+TASK [node-setup : Disable unattended-upgrades auto-reboot (Debian/Ubuntu only)] ***
+[DEPRECATION WARNING]: INJECT_FACTS_AS_VARS default to `True` is deprecated, top-level facts will not be auto injected after the change. This feature will be removed from ansible-core version 2.24.
+Origin: /mnt/c/Users/ishik/OneDrive/Documents/GitHub/k8s-ansible-config/roles/node-setup/tasks/main.yml:45:9
+
+43     regexp: '^Unattended-Upgrade::Automatic-Reboot'
+44     line: 'Unattended-Upgrade::Automatic-Reboot "false";'
+45   when: ansible_os_family == "Debian"
+           ^ column 9
+
+Use `ansible_facts["fact_name"]` (no `ansible_` prefix) instead.
+
+skipping: [i-0103fdc8f57e41432]
+skipping: [i-0c6deff143ea4b17e]
+
+TASK [node-setup : Ensure UFW is installed (Debian/Ubuntu only)] ***************
+[DEPRECATION WARNING]: INJECT_FACTS_AS_VARS default to `True` is deprecated, top-level facts will not be auto injected after the change. This feature will be removed from ansible-core version 2.24.
+Origin: /mnt/c/Users/ishik/OneDrive/Documents/GitHub/k8s-ansible-config/roles/node-setup/tasks/main.yml:52:9
+
+50     state: present
+51     update_cache: true
+52   when: ansible_os_family == "Debian"
+           ^ column 9
+
+Use `ansible_facts["fact_name"]` (no `ansible_` prefix) instead.
+
+skipping: [i-0103fdc8f57e41432]
+skipping: [i-0c6deff143ea4b17e]
+
+TASK [node-setup : Allow only required ports (kubelet, node-exporter, SSH) — Debian/Ubuntu only] ***
+[DEPRECATION WARNING]: INJECT_FACTS_AS_VARS default to `True` is deprecated, top-level facts will not be auto injected after the change. This feature will be removed from ansible-core version 2.24.
+Origin: /mnt/c/Users/ishik/OneDrive/Documents/GitHub/k8s-ansible-config/roles/node-setup/tasks/main.yml:63:9
+
+61     - "10250"
+62     - "9100"
+63   when: ansible_os_family == "Debian"
+           ^ column 9
+
+Use `ansible_facts["fact_name"]` (no `ansible_` prefix) instead.
+
+skipping: [i-0103fdc8f57e41432] => (item=22) 
+skipping: [i-0103fdc8f57e41432] => (item=10250) 
+skipping: [i-0103fdc8f57e41432] => (item=9100) 
+skipping: [i-0c6deff143ea4b17e] => (item=22) 
+skipping: [i-0103fdc8f57e41432]
+skipping: [i-0c6deff143ea4b17e] => (item=10250) 
+skipping: [i-0c6deff143ea4b17e] => (item=9100) 
+skipping: [i-0c6deff143ea4b17e]
+
+TASK [node-setup : Enable UFW (Debian/Ubuntu only)] ****************************
+[DEPRECATION WARNING]: INJECT_FACTS_AS_VARS default to `True` is deprecated, top-level facts will not be auto injected after the change. This feature will be removed from ansible-core version 2.24.
+Origin: /mnt/c/Users/ishik/OneDrive/Documents/GitHub/k8s-ansible-config/roles/node-setup/tasks/main.yml:69:9
+
+67     state: enabled
+68     policy: deny
+69   when: ansible_os_family == "Debian"
+           ^ column 9
+
+Use `ansible_facts["fact_name"]` (no `ansible_` prefix) instead.
+
+skipping: [i-0103fdc8f57e41432]
+skipping: [i-0c6deff143ea4b17e]
+
+TASK [node-setup : Note firewall approach for RedHat-family (AL2023) hosts] ****
+[DEPRECATION WARNING]: INJECT_FACTS_AS_VARS default to `True` is deprecated, top-level facts will not be auto injected after the change. This feature will be removed from ansible-core version 2.24.
+Origin: /mnt/c/Users/ishik/OneDrive/Documents/GitHub/k8s-ansible-config/roles/node-setup/tasks/main.yml:77:9
+
+75       at the AWS security-group layer instead (see terraform/eks.tf worker
+76       security group rules).
+77   when: ansible_os_family != "Debian"
+           ^ column 9
+
+Use `ansible_facts["fact_name"]` (no `ansible_` prefix) instead.
+
+[DEPRECATION WARNING]: INJECT_FACTS_AS_VARS default to `True` is deprecated, top-level facts will not be auto injected after the change. This feature will be removed from ansible-core version 2.24.
+Origin: /mnt/c/Users/ishik/OneDrive/Documents/GitHub/k8s-ansible-config/roles/node-setup/tasks/main.yml:73:10
+
+71 - name: Note firewall approach for RedHat-family (AL2023) hosts
+72   debug:
+73     msg: >
+            ^ column 10
+
+Use `ansible_facts["fact_name"]` (no `ansible_` prefix) instead.
+
+ok: [i-0103fdc8f57e41432] => {
+    "msg": "Host firewall skipped on Amazon — traffic is restricted at the AWS security-group layer instead (see terraform/eks.tf worker security group rules).\n"
+}
+ok: [i-0c6deff143ea4b17e] => {
+    "msg": "Host firewall skipped on Amazon — traffic is restricted at the AWS security-group layer instead (see terraform/eks.tf worker security group rules).\n"
+}
+
+TASK [node-setup : Install containerd dependencies (Debian/Ubuntu only)] *******
+[DEPRECATION WARNING]: INJECT_FACTS_AS_VARS default to `True` is deprecated, top-level facts will not be auto injected after the change. This feature will be removed from ansible-core version 2.24.
+Origin: /mnt/c/Users/ishik/OneDrive/Documents/GitHub/k8s-ansible-config/roles/node-setup/tasks/main.yml:89:9
+
+87     state: present
+88     update_cache: true
+89   when: ansible_os_family == "Debian"
+           ^ column 9
+
+Use `ansible_facts["fact_name"]` (no `ansible_` prefix) instead.
+
+skipping: [i-0103fdc8f57e41432]
+skipping: [i-0c6deff143ea4b17e]
+
+TASK [node-setup : Install containerd (Debian/Ubuntu only)] ********************
+[DEPRECATION WARNING]: INJECT_FACTS_AS_VARS default to `True` is deprecated, top-level facts will not be auto injected after the change. This feature will be removed from ansible-core version 2.24.
+Origin: /mnt/c/Users/ishik/OneDrive/Documents/GitHub/k8s-ansible-config/roles/node-setup/tasks/main.yml:95:9
+
+93     name: containerd
+94     state: present
+95   when: ansible_os_family == "Debian"
+           ^ column 9
+
+Use `ansible_facts["fact_name"]` (no `ansible_` prefix) instead.
+
+skipping: [i-0103fdc8f57e41432]
+skipping: [i-0c6deff143ea4b17e]
+
+TASK [node-setup : Create containerd config directory (Debian/Ubuntu only)] ****
+[DEPRECATION WARNING]: INJECT_FACTS_AS_VARS default to `True` is deprecated, top-level facts will not be auto injected after the change. This feature will be removed from ansible-core version 2.24.
+Origin: /mnt/c/Users/ishik/OneDrive/Documents/GitHub/k8s-ansible-config/roles/node-setup/tasks/main.yml:101:9
+
+ 99     path: /etc/containerd
+100     state: directory
+101   when: ansible_os_family == "Debian"
+            ^ column 9
+
+Use `ansible_facts["fact_name"]` (no `ansible_` prefix) instead.
+
+skipping: [i-0103fdc8f57e41432]
+skipping: [i-0c6deff143ea4b17e]
+
+TASK [node-setup : Generate default containerd config (Debian/Ubuntu only)] ****
+[DEPRECATION WARNING]: INJECT_FACTS_AS_VARS default to `True` is deprecated, top-level facts will not be auto injected after the change. This feature will be removed from ansible-core version 2.24.
+Origin: /mnt/c/Users/ishik/OneDrive/Documents/GitHub/k8s-ansible-config/roles/node-setup/tasks/main.yml:107:9
+
+105   args:
+106     creates: /etc/containerd/config.toml
+107   when: ansible_os_family == "Debian"
+            ^ column 9
+
+Use `ansible_facts["fact_name"]` (no `ansible_` prefix) instead.
+
+skipping: [i-0103fdc8f57e41432]
+skipping: [i-0c6deff143ea4b17e]
+
+TASK [node-setup : Enable SystemdCgroup for containerd (Debian/Ubuntu only)] ***
+[DEPRECATION WARNING]: INJECT_FACTS_AS_VARS default to `True` is deprecated, top-level facts will not be auto injected after the change. This feature will be removed from ansible-core version 2.24.
+Origin: /mnt/c/Users/ishik/OneDrive/Documents/GitHub/k8s-ansible-config/roles/node-setup/tasks/main.yml:115:9
+
+113     line: '            SystemdCgroup = true'
+114   notify: restart containerd
+115   when: ansible_os_family == "Debian"
+            ^ column 9
+
+Use `ansible_facts["fact_name"]` (no `ansible_` prefix) instead.
+
+skipping: [i-0103fdc8f57e41432]
+skipping: [i-0c6deff143ea4b17e]
+
+TASK [node-setup : Note containerd approach for RedHat-family (AL2023) hosts] ***
+[DEPRECATION WARNING]: INJECT_FACTS_AS_VARS default to `True` is deprecated, top-level facts will not be auto injected after the change. This feature will be removed from ansible-core version 2.24.
+Origin: /mnt/c/Users/ishik/OneDrive/Documents/GitHub/k8s-ansible-config/roles/node-setup/tasks/main.yml:123:9
+
+121       AMI bootstrap process — skipping manual install/config to avoid overwriting
+122       AWS's working setup.
+123   when: ansible_os_family != "Debian"
+            ^ column 9
+
+Use `ansible_facts["fact_name"]` (no `ansible_` prefix) instead.
+
+ok: [i-0103fdc8f57e41432] => {
+    "msg": "containerd is pre-installed and pre-configured by the AL2023 EKS-optimized AMI bootstrap process — skipping manual install/config to avoid overwriting AWS's working setup.\n"
+}
+ok: [i-0c6deff143ea4b17e] => {
+    "msg": "containerd is pre-installed and pre-configured by the AL2023 EKS-optimized AMI bootstrap process — skipping manual install/config to avoid overwriting AWS's working setup.\n"
+}
+
+TASK [node-setup : Ensure containerd is enabled and running] *******************
+changed: [i-0c6deff143ea4b17e]
+changed: [i-0103fdc8f57e41432]
+
+TASK [node-exporter : Create node_exporter system user] ************************
+changed: [i-0c6deff143ea4b17e]
+changed: [i-0103fdc8f57e41432]
+
+TASK [node-exporter : Download node_exporter binary] ***************************
+changed: [i-0103fdc8f57e41432]
+changed: [i-0c6deff143ea4b17e]
+
+TASK [node-exporter : Extract node_exporter] ***********************************
+[ERROR]: Task failed: Module failed: Source '/tmp/node_exporter.tar.gz' does not exist
+Origin: /mnt/c/Users/ishik/OneDrive/Documents/GitHub/k8s-ansible-config/roles/node-exporter/tasks/main.yml:15:3
+
+13     mode: '0644'
+14
+15 - name: Extract node_exporter
+     ^ column 3
+
+fatal: [i-0c6deff143ea4b17e]: FAILED! => {"changed": false, "msg": "Source '/tmp/node_exporter.tar.gz' does not exist"}
+fatal: [i-0103fdc8f57e41432]: FAILED! => {"changed": false, "msg": "Source '/tmp/node_exporter.tar.gz' does not exist"}
+
+PLAY RECAP *********************************************************************
+i-0103fdc8f57e41432        : ok=10   changed=6    unreachable=0    failed=1    skipped=10   rescued=0    ignored=0   
+i-0c6deff143ea4b17e        : ok=10   changed=6    unreachable=0    failed=1    skipped=10   rescued=0    ignored=0   
+

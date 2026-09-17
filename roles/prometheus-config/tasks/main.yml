@@ -13,6 +13,7 @@
     src: node_targets.json.j2
     dest: "{{ playbook_dir }}/generated/node_targets.json"
   delegate_to: localhost
+  become: false
   run_once: true
 
 - name: Show reminder to sync targets into the cluster ConfigMap
@@ -24,4 +25,5 @@
       --from-file=node_targets.json={{ playbook_dir }}/generated/node_targets.json
       -n monitoring --dry-run=client -o yaml | kubectl apply -f -
   delegate_to: localhost
+  become: false
   run_once: true
